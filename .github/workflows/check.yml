@@ -30,6 +30,6 @@ jobs:
       - name: Lint
         run: |
           flake8 --exclude venv  .
-          mypy --install-types handlers/handler.py  
+          
           mypy --exclude venv --exclude main .
           black --line-length 79 --skip-string-normalization --check .
