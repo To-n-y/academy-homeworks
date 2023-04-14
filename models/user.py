@@ -13,12 +13,19 @@ class User:
         self.about = about
 
     def __str__(self):
-        return f"User(id={self.id}, name={self.name}, " \
-               f"email={self.email}, age={self.age}, about={self.about})"
+        return (
+            f"User(id={self.id}, name={self.name}, "
+            f"email={self.email}, age={self.age}, about={self.about})"
+        )
 
     def __eq__(self, other):
         return self.id == other.id
 
     def json(self):
-        return {"id": self.id, "name": self.name,
-                "email": self.email, "age": self.age, "about": self.about}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "age": self.age,
+            "about": self.about,
+        }

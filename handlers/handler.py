@@ -21,17 +21,19 @@ class Handler(object):
             exist_user = self.service.get_user(id)
             return exist_user
         except Exception:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
 
-    def create_user(self, id: int, name: str,
-                    email: str, age: int, about: str):
+    def create_user(
+        self, id: int, name: str, email: str, age: int, about: str
+    ):
         user = User(id, name, email, age, about)
         res = self.service.create_user(user)
         if res == 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User is already exist"
+                detail="User is already exist",
             )
         else:
             return user
@@ -41,44 +43,48 @@ class Handler(object):
         if res == 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User not found"
+                detail="User not found",
             )
         elif res == 2:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You can`t be friends with yourself"
+                detail="You can`t be friends with yourself",
             )
         elif res == 3:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You are already friends"
+                detail="You are already friends",
             )
         else:
             return {"message": "OK"}
 
-    def edit_user(self, id: int, name: str,
-                  email: str, age: int, about: str):
+    def edit_user(self, id: int, name: str, email: str, age: int, about: str):
         user = User(id=id, name=name, email=email, age=age, about=about)
         res = self.service.edit_user(id, user)
         if res == 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User not found"
+                detail="User not found",
             )
         else:
             return user
 
     def add_route(self):
-        self._router.get("/", response_model=dict,
-                         status_code=status.HTTP_200_OK)(self.home)
-        self._router.get("/users",
-                         status_code=status.HTTP_200_OK)(self.get_users)
-        self._router.get("/user",
-                         status_code=status.HTTP_200_OK)(self.get_user)
-        self._router.post("/user",
-                          status_code=status.HTTP_200_OK)(self.create_user)
-        self._router.post("/friends",
-                          response_model=dict,
-                          status_code=status.HTTP_200_OK)(self.create_friend)
-        self._router.put("/user",
-                         status_code=status.HTTP_200_OK)(self.edit_user)
+        self._router.get(
+            "/", response_model=dict, status_code=status.HTTP_200_OK
+        )(self.home)
+        self._router.get("/users", status_code=status.HTTP_200_OK)(
+            self.get_users
+        )
+        self._router.get("/user", status_code=status.HTTP_200_OK)(
+            self.get_user
+        )
+        self._router.post("/user", status_code=status.HTTP_200_OK)(
+            self.create_user
+        )
+        self._router.post(
+            "/friends", response_model=dict, status_code=status.HTTP_200_OK
+        )(self.create_friend)
+        self._router.put("/user", status_code=status.HTTP_200_OK)(
+            self.edit_user
+        )

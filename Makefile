@@ -4,7 +4,7 @@ test:
 .PHONY: lint
 lint:
 	flake8 --exclude venv  .
-	mypy --exclude venv .
+	mypy --exclude venv --exclude main .
 	black --line-length 79 --skip-string-normalization --check .
 
 .PHONY: test

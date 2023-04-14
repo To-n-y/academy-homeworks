@@ -32,8 +32,7 @@ class Service(ServiceInterface):
         return users_list
 
     def get_user(self, id: int) -> User:
-        user = next((user for user in
-                     users_list if user.id == id), None)
+        user = next((user for user in users_list if user.id == id), None)
         if user is None:
             raise Exception
         return user
@@ -45,8 +44,7 @@ class Service(ServiceInterface):
         return 2
 
     def edit_user(self, id, user: User) -> int:
-        exist_user = next((usr for usr in
-                           users_list if usr.id == id), None)
+        exist_user = next((usr for usr in users_list if usr.id == id), None)
         if exist_user is None:
             return 1
         exist_user.name = user.name
@@ -56,10 +54,12 @@ class Service(ServiceInterface):
         return 2
 
     def add_relation(self, first_id: int, second_id: int):
-        first_user = next((user for user in
-                           users_list if user.id == first_id), None)
-        second_user = next((user for user in
-                            users_list if user.id == second_id), None)
+        first_user = next(
+            (user for user in users_list if user.id == first_id), None
+        )
+        second_user = next(
+            (user for user in users_list if user.id == second_id), None
+        )
         if first_user is None or second_user is None:
             return 1
         if first_user == second_user:
