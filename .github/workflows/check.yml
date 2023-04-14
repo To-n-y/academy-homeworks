@@ -24,10 +24,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
           pip install mypy
-          
+          pip install mypy-extensions
           pip install black==23.1a1
       - name: Lint with flake8
         run: |
           flake8 --exclude venv  .
-          
+          mypy --exclude venv --exclude main .
           black --line-length 79 --skip-string-normalization --check .
