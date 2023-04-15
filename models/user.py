@@ -5,12 +5,13 @@ class User:
     age: int
     about: str
 
-    def __init__(self, id, name, email, age, about):
+    def __init__(self, id: int, name: str, email: str, age: int, about: str, password: str):
         self.id = id
         self.name = name
         self.email = email
         self.age = age
         self.about = about
+        self.password = password
 
     def __str__(self):
         return (

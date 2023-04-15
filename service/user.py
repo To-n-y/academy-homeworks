@@ -37,6 +37,13 @@ class Service(ServiceInterface):
             raise Exception
         return user
 
+    @classmethod
+    def get_user_by_email(cls, email: str):
+        user = next((user for user in users_list if user.email == email), None)
+        if user is None:
+            raise Exception
+        return user
+
     def create_user(self, user: User) -> int:
         if user in users_list:
             return 1

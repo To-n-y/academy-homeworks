@@ -1,8 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 from models.user import User
+from schemas import SystemUser
 from service.user import Service
+from utils import get_hashed_password, verify_password, create_access_token, create_refresh_token
+from deps import get_current_user
 
 
 class Handler(object):
@@ -12,6 +16,9 @@ class Handler(object):
 
     def home(self):
         return {"message": "OK"}
+
+    def get_me(self, user: SystemUser = Depends(get_current_user)):
+        return user
 
     def get_users(self):
         return self.service.get_users()
@@ -26,9 +33,9 @@ class Handler(object):
             )
 
     def create_user(
-        self, id: int, name: str, email: str, age: int, about: str
+            self, id: int, name: str, email: str, age: int, about: str, password: str
     ):
-        user = User(id, name, email, age, about)
+        user = User(id=id, name=name, email=email, age=age, about=about, password=get_hashed_password(password))
         res = self.service.create_user(user)
         if res == 1:
             raise HTTPException(
@@ -37,6 +44,29 @@ class Handler(object):
             )
         else:
             return user
+
+    def login_user(
+            self, name: str, email: str, password: str
+    ):
+        try:
+            user = self.service.get_user_by_email(email)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect name or email"
+            )
+
+        hashed_pass = user.password
+        if not verify_password(password, hashed_pass):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect email or password"
+            )
+
+        return {
+            "access_token": create_access_token(user.email),
+            "refresh_token": create_refresh_token(user.email),
+        }
 
     def create_friend(self, first_id: int, second_id: int):
         res = self.service.add_relation(first_id, second_id)
@@ -58,8 +88,8 @@ class Handler(object):
         else:
             return {"message": "OK"}
 
-    def edit_user(self, id: int, name: str, email: str, age: int, about: str):
-        user = User(id=id, name=name, email=email, age=age, about=about)
+    def edit_user(self, id: int, name: str, email: str, age: int, about: str, password: str):
+        user = User(id=id, name=name, email=email, age=age, about=about, password=password)
         res = self.service.edit_user(id, user)
         if res == 1:
             raise HTTPException(
@@ -71,16 +101,24 @@ class Handler(object):
 
     def add_route(self):
         self._router.get(
-            "/", response_model=dict, status_code=status.HTTP_200_OK
-        )(self.home)
+            "/", response_model=dict, status_code=status.HTTP_200_OK)(
+            self.home
+        )
+        self._router.get(
+            "/me", status_code=status.HTTP_200_OK)(
+            self.get_me
+        )
         self._router.get("/users", status_code=status.HTTP_200_OK)(
             self.get_users
         )
         self._router.get("/user", status_code=status.HTTP_200_OK)(
             self.get_user
         )
-        self._router.post("/user", status_code=status.HTTP_200_OK)(
+        self._router.post("/signup", status_code=status.HTTP_200_OK)(
             self.create_user
+        )
+        self._router.post("/login", status_code=status.HTTP_200_OK)(
+            self.login_user
         )
         self._router.post(
             "/friends", response_model=dict, status_code=status.HTTP_200_OK
