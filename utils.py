@@ -7,8 +7,13 @@ import jwt
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 ALGORITHM = "HS256"
-JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'secret1')
-JWT_REFRESH_SECRET_KEY = os.getenv('JWT_REFRESH_SECRET_KEY', 'secret2')
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "secret1")
+JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY", "secret2")
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -43,4 +48,4 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) ->
 
 
 if __name__ == "__main__":
-    print(get_hashed_password("qwe"))
+    print(JWT_REFRESH_SECRET_KEY)

@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
@@ -17,8 +19,8 @@ class Handler(object):
     def home(self):
         return {"message": "OK"}
 
-    def get_me(self, user: SystemUser = Depends(get_current_user)):
-        return user
+    def get_me(self, current_user: User = Depends(get_current_user)):
+        return current_user
 
     def get_users(self):
         return self.service.get_users()
@@ -46,10 +48,10 @@ class Handler(object):
             return user
 
     def login_user(
-            self, name: str, email: str, password: str
+            self, form_data: OAuth2PasswordRequestForm = Depends()
     ):
         try:
-            user = self.service.get_user_by_email(email)
+            user = self.service.get_user_by_email(form_data.username)
         except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -57,12 +59,11 @@ class Handler(object):
             )
 
         hashed_pass = user.password
-        if not verify_password(password, hashed_pass):
+        if not verify_password(form_data.password, hashed_pass):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Incorrect email or password"
             )
-
         return {
             "access_token": create_access_token(user.email),
             "refresh_token": create_refresh_token(user.email),
@@ -89,7 +90,7 @@ class Handler(object):
             return {"message": "OK"}
 
     def edit_user(self, id: int, name: str, email: str, age: int, about: str, password: str):
-        user = User(id=id, name=name, email=email, age=age, about=about, password=password)
+        user = User(id=id, name=name, email=email, age=age, about=about, password=get_hashed_password(password))
         res = self.service.edit_user(id, user)
         if res == 1:
             raise HTTPException(

@@ -1,25 +1,24 @@
-from typing import Union, Any
 from datetime import datetime
 
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from pydantic import ValidationError
+
+from models.user import User
+from schemas import TokenPayload
+from service.user import Service
 from utils import (
     ALGORITHM,
     JWT_SECRET_KEY
 )
 
-from pydantic import ValidationError
-from schemas import TokenPayload, SystemUser
-from service.user import Service
-
-reuseable_oauth = OAuth2PasswordBearer(
-    tokenUrl="/login",
-    scheme_name="JWT"
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/login"
 )
 
 
-def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     try:
         payload = jwt.decode(
             token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
@@ -39,13 +38,12 @@ def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # user: Union[dict[str, Any], None] = db.get(token_data.sub, None)
     try:
         user = Service.get_user_by_email(token_data.sub)
+        print(token_data.sub, token_data.exp)
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find user",
         )
-    usr = SystemUser(id=user.id, email=user.email, password=user.password)
-    return usr
+    return user

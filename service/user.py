@@ -58,6 +58,7 @@ class Service(ServiceInterface):
         exist_user.email = user.email
         exist_user.age = user.age
         exist_user.about = user.about
+        exist_user.password = user.password
         return 2
 
     def add_relation(self, first_id: int, second_id: int):
