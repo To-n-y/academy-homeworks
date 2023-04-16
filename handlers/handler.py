@@ -8,7 +8,6 @@ from utils import (
     get_hashed_password,
     verify_password,
     create_access_token,
-    create_refresh_token,
 )
 from deps import get_current_user
 
@@ -63,6 +62,7 @@ class Handler(object):
             return user
 
     def login_user(self, form_data: OAuth2PasswordRequestForm = Depends()):
+        # TODO: username=login
         try:
             user = self.service.get_user_by_email(form_data.username)
         except Exception:
@@ -77,10 +77,7 @@ class Handler(object):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Incorrect email or password",
             )
-        return {
-            "access_token": create_access_token(user.email),
-            "refresh_token": create_refresh_token(user.email),
-        }
+        return {"access_token": create_access_token(user.email)}
 
     def create_friend(self, first_id: int, second_id: int):
         res = self.service.add_relation(first_id, second_id)
