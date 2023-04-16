@@ -1,13 +1,15 @@
-import json
-
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 from models.user import User
-from schemas import SystemUser
 from service.user import Service
-from utils import get_hashed_password, verify_password, create_access_token, create_refresh_token
+from utils import (
+    get_hashed_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+)
 from deps import get_current_user
 
 
@@ -35,9 +37,22 @@ class Handler(object):
             )
 
     def create_user(
-            self, id: int, name: str, email: str, age: int, about: str, password: str
+        self,
+        id: int,
+        name: str,
+        email: str,
+        age: int,
+        about: str,
+        password: str,
     ):
-        user = User(id=id, name=name, email=email, age=age, about=about, password=get_hashed_password(password))
+        user = User(
+            id=id,
+            name=name,
+            email=email,
+            age=age,
+            about=about,
+            password=get_hashed_password(password),
+        )
         res = self.service.create_user(user)
         if res == 1:
             raise HTTPException(
@@ -47,22 +62,20 @@ class Handler(object):
         else:
             return user
 
-    def login_user(
-            self, form_data: OAuth2PasswordRequestForm = Depends()
-    ):
+    def login_user(self, form_data: OAuth2PasswordRequestForm = Depends()):
         try:
             user = self.service.get_user_by_email(form_data.username)
         except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect name or email"
+                detail="Incorrect name or email",
             )
 
         hashed_pass = user.password
         if not verify_password(form_data.password, hashed_pass):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Incorrect email or password"
+                detail="Incorrect email or password",
             )
         return {
             "access_token": create_access_token(user.email),
@@ -89,8 +102,23 @@ class Handler(object):
         else:
             return {"message": "OK"}
 
-    def edit_user(self, id: int, name: str, email: str, age: int, about: str, password: str):
-        user = User(id=id, name=name, email=email, age=age, about=about, password=get_hashed_password(password))
+    def edit_user(
+        self,
+        id: int,
+        name: str,
+        email: str,
+        age: int,
+        about: str,
+        password: str,
+    ):
+        user = User(
+            id=id,
+            name=name,
+            email=email,
+            age=age,
+            about=about,
+            password=get_hashed_password(password),
+        )
         res = self.service.edit_user(id, user)
         if res == 1:
             raise HTTPException(
@@ -102,13 +130,9 @@ class Handler(object):
 
     def add_route(self):
         self._router.get(
-            "/", response_model=dict, status_code=status.HTTP_200_OK)(
-            self.home
-        )
-        self._router.get(
-            "/me", status_code=status.HTTP_200_OK)(
-            self.get_me
-        )
+            "/", response_model=dict, status_code=status.HTTP_200_OK
+        )(self.home)
+        self._router.get("/me", status_code=status.HTTP_200_OK)(self.get_me)
         self._router.get("/users", status_code=status.HTTP_200_OK)(
             self.get_users
         )
@@ -121,9 +145,9 @@ class Handler(object):
         self._router.post("/login", status_code=status.HTTP_200_OK)(
             self.login_user
         )
-        self._router.post(
-            "/friends", response_model=dict, status_code=status.HTTP_200_OK
-        )(self.create_friend)
+        self._router.post("/friends", status_code=status.HTTP_200_OK)(
+            self.create_friend
+        )
         self._router.put("/user", status_code=status.HTTP_200_OK)(
             self.edit_user
         )

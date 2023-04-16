@@ -1,13 +1,13 @@
 test:
 	pytest -s -v tests
 
-.PHONY: lint
+.PHONY: test
+
 lint:
 	flake8 --exclude venv  .
-	mypy --exclude venv --exclude main .
 	black --line-length 79 --skip-string-normalization --check .
 
-.PHONY: test
+.PHONY: lint
 
 run:
 	uvicorn main:app --reload

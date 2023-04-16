@@ -8,21 +8,14 @@ from pydantic import ValidationError
 from models.user import User
 from schemas import TokenPayload
 from service.user import Service
-from utils import (
-    ALGORITHM,
-    JWT_SECRET_KEY
-)
+from utils import ALGORITHM, JWT_SECRET_KEY
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     try:
-        payload = jwt.decode(
-            token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
-        )
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
 
         if datetime.fromtimestamp(token_data.exp) < datetime.now():
