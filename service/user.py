@@ -86,3 +86,23 @@ class Service(ServiceInterface):
         relations_dict[first_id].append(second_id)
         relations_dict[second_id].append(first_id)
         return 4
+
+    def is_friends(self, first_id: int, second_id: int):
+        first_user = next(
+            (user for user in users_list if user.id == first_id), None
+        )
+        second_user = next(
+            (user for user in users_list if user.id == second_id), None
+        )
+        if first_user is None or second_user is None:
+            return 1
+        if first_user == second_user:
+            return 2
+        tmp: list | None = relations_dict.get(first_id, None)
+        if tmp is None:
+            relations_dict[first_id] = []
+            tmp = []
+        if second_id in tmp:
+            return 3
+        else:
+            return 4

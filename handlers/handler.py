@@ -99,6 +99,23 @@ class Handler(object):
         else:
             return {"message": "OK"}
 
+    def is_friend(self, first_id: int, second_id: int):
+        res = self.service.is_friends(first_id, second_id)
+        if res == 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User not found",
+            )
+        elif res == 2:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You can`t be friends with yourself",
+            )
+        elif res == 3:
+            return {"message": "Yes"}
+        else:
+            return {"message": "No"}
+
     def edit_user(
         self,
         id: int,
@@ -144,6 +161,9 @@ class Handler(object):
         )
         self._router.post("/friends", status_code=status.HTTP_200_OK)(
             self.create_friend
+        )
+        self._router.post("/is_friends", status_code=status.HTTP_200_OK)(
+            self.is_friend
         )
         self._router.put("/user", status_code=status.HTTP_200_OK)(
             self.edit_user
