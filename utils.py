@@ -40,4 +40,7 @@ def create_access_token(
 
 
 # if __name__ == "__main__":
-#    print(JWT_SECRET_KEY)
+#    print(verify_password("str",
+#    "$2b$12$kIG5BpIumib1hRCkU3mj6.5gKAFhJxC4E5x4GG1zCC/xQhcZKEx4S"))
+#    print(verify_password("str",
+#    "$2b$12$6gaoUkiMHueMhhnLcU2tr.FuhAvTccn3VNW5/VmWHpy3Oj2sklcJq"))
