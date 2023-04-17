@@ -79,8 +79,8 @@ class Handler(object):
             )
         return {"access_token": create_access_token(user.email)}
 
-    def create_friend(self, first_id: int, second_id: int):
-        res = self.service.add_relation(first_id, second_id)
+    def create_friend(self, second_id: int, current_user: User = Depends(get_current_user)):
+        res = self.service.add_relation(current_user.id, second_id)
         if res == 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
