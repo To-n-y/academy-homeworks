@@ -1,11 +1,9 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 
-from service.user import Service
-from handlers.handler import Handler
+from routers.routerfriends import routerFriends
+from routers.routeruser import routerUser
 
 app = FastAPI()
-router = APIRouter()
-service = Service()
-router.handler = Handler(service, router)
-router.handler.add_route()
-app.include_router(router)
+
+app.include_router(routerUser)
+app.include_router(routerFriends)
