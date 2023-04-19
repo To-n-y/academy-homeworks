@@ -22,7 +22,6 @@ class UserHandler(object):
         return {"message": "OK"}
 
     def get_me(self, current_user: UserAuth = Depends(get_current_user)):
-        print(current_user)
         return current_user
 
     def get_users(self):

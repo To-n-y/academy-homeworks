@@ -5,15 +5,15 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 
-from models.user import User
-from schemas import TokenPayload
+from schemas.TokenSchemas import TokenPayload
+from schemas.UserSchemas import UserAuth
 from service.user import Service
-from utils import ALGORITHM, JWT_SECRET_KEY
+from utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuth:
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
@@ -39,4 +39,5 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find user",
         )
-    return user
+    usr = UserAuth(**{"email": user.email, "password": user.password})
+    return usr
