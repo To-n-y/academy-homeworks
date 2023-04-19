@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 from models.user import User
+from schemas.UserSchemas import UserAuth
 from service.user import Service
-from utils import (
+from utils.jwtutils import (
     get_hashed_password,
     verify_password,
     create_access_token,
@@ -12,7 +13,7 @@ from utils import (
 from deps import get_current_user
 
 
-class Handler(object):
+class UserHandler(object):
     def __init__(self, service: Service, router: APIRouter):
         self._router = router
         self.service = service
@@ -20,7 +21,8 @@ class Handler(object):
     def home(self):
         return {"message": "OK"}
 
-    def get_me(self, current_user: User = Depends(get_current_user)):
+    def get_me(self, current_user: UserAuth = Depends(get_current_user)):
+        print(current_user)
         return current_user
 
     def get_users(self):
@@ -62,7 +64,6 @@ class Handler(object):
             return user
 
     def login_user(self, form_data: OAuth2PasswordRequestForm = Depends()):
-        # TODO: username=login
         try:
             user = self.service.get_user_by_email(form_data.username)
         except Exception:
@@ -78,43 +79,6 @@ class Handler(object):
                 detail="Incorrect email or password",
             )
         return {"access_token": create_access_token(user.email)}
-
-    def create_friend(self, second_id: int, current_user: User = Depends(get_current_user)):
-        res = self.service.add_relation(current_user.id, second_id)
-        if res == 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User not found",
-            )
-        elif res == 2:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You can`t be friends with yourself",
-            )
-        elif res == 3:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You are already friends",
-            )
-        else:
-            return {"message": "OK"}
-
-    def is_friend(self, first_id: int, second_id: int):
-        res = self.service.is_friends(first_id, second_id)
-        if res == 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User not found",
-            )
-        elif res == 2:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="You can`t be friends with yourself",
-            )
-        elif res == 3:
-            return {"message": "Yes"}
-        else:
-            return {"message": "No"}
 
     def edit_user(
         self,
@@ -143,9 +107,7 @@ class Handler(object):
             return user
 
     def add_route(self):
-        self._router.get(
-            "/", response_model=dict, status_code=status.HTTP_200_OK
-        )(self.home)
+        self._router.get("/", status_code=status.HTTP_200_OK)(self.home)
         self._router.get("/me", status_code=status.HTTP_200_OK)(self.get_me)
         self._router.get("/users", status_code=status.HTTP_200_OK)(
             self.get_users
@@ -158,12 +120,6 @@ class Handler(object):
         )
         self._router.post("/login", status_code=status.HTTP_200_OK)(
             self.login_user
-        )
-        self._router.post("/friends", status_code=status.HTTP_200_OK)(
-            self.create_friend
-        )
-        self._router.post("/is_friends", status_code=status.HTTP_200_OK)(
-            self.is_friend
         )
         self._router.put("/user", status_code=status.HTTP_200_OK)(
             self.edit_user

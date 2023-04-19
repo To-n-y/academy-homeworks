@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class TokenSchema(BaseModel):
@@ -11,10 +11,8 @@ class TokenPayload(BaseModel):
 
 
 class UserAuth(BaseModel):
-    email: str = Field(..., description="user email")
-    password: str = Field(
-        ..., min_length=5, max_length=24, description="user password"
-    )
+    email: str | None
+    password: str | None
 
 
 class UserOut(BaseModel):
