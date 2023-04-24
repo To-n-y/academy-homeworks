@@ -10,7 +10,7 @@ from schemas.UserSchemas import UserAuth
 from service.user import Service
 from utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuth:

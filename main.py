@@ -5,5 +5,5 @@ from routers.routeruser import routerUser
 
 app = FastAPI()
 
-app.include_router(routerUser)
-app.include_router(routerFriends)
+app.include_router(routerUser, prefix="/user")
+app.include_router(routerFriends, prefix="/friends")
