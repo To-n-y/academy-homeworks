@@ -1,3 +1,5 @@
+import pytest
+import websockets
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -26,3 +28,17 @@ def test_websockets():
         websocket.send_text("HelloWorld")
         data = websocket.receive_text()
         assert data == "You sent: HelloWorld"
+
+
+@pytest.mark.asyncio
+async def test_chat_room():
+    async with websockets.connect('ws://localhost:8000/ws/test') as ws1:
+        async with websockets.connect('ws://localhost:8000/ws/test') as ws2:
+            await ws1.send('Hello from ws1')
+            await ws2.send('Hello from ws2')
+            message1 = await ws1.recv()
+            message2 = await ws2.recv()
+            assert message1 == 'Hello from ws2'
+            assert message2 == 'Hello from ws1'
+        assert ws2.closed
+    assert ws1.closed
