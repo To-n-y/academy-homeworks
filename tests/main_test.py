@@ -1,3 +1,4 @@
+import websockets
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -25,4 +26,4 @@ def test_websockets():
     with client.websocket_connect("/ws") as websocket:
         websocket.send_text("HelloWorld")
         data = websocket.receive_text()
-        assert data == "You send: HelloWorld"
+        assert data == "You sent: HelloWorld"
