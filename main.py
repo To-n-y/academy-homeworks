@@ -2,7 +2,6 @@ from fastapi import FastAPI, WebSocket
 
 from routers.routerfriends import routerFriends
 from routers.routeruser import routerUser
-from routers.routerws import routerws
 
 app = FastAPI()
 
