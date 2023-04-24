@@ -7,12 +7,12 @@ client = TestClient(app)
 
 
 def test_home():
-    response = client.get("/")
+    response = client.get("/user")
     assert response.status_code == status.HTTP_200_OK
 
 
 def test_select():
-    response = client.get("/users")
+    response = client.get("/user/users")
     assert response.status_code == status.HTTP_200_OK
 
 
