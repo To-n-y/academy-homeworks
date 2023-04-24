@@ -19,3 +19,10 @@ def test_select():
 def test_select_by_id():
     response = client.get("/user?id=1")
     assert response.status_code == status.HTTP_200_OK
+
+
+def test_websockets():
+    with client.websocket_connect("/ws") as websocket:
+        websocket.send_text("HelloWorld")
+        data = websocket.receive_text()
+        assert data == "You send: HelloWorld"
