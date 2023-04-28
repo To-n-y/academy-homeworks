@@ -8,7 +8,7 @@ conn = sqlite3.connect(db_path)
 
 conn.execute(
     """
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS User (
     id INTEGER PRIMARY KEY,
     name TEXT,
     email TEXT,
@@ -18,5 +18,6 @@ CREATE TABLE users (
 );
 """
 )
+conn.commit()
 
 conn.close()
