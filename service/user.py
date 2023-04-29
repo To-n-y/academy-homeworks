@@ -1,7 +1,6 @@
 import abc
 import os
 import sqlite3
-from sqlite3 import Cursor
 
 from config import DATABASE_URL
 from data.data import users_list, relations_dict
@@ -66,10 +65,19 @@ class Service(ServiceInterface):
     def create_user(self, user: User) -> int:
         db_path = os.path.join(os.getcwd(), DATABASE_URL)
         conn = sqlite3.connect(db_path)
-        user_data = (user.id, user.name, user.email, user.age, user.about, user.password)
+        user_data = (
+            user.id,
+            user.name,
+            user.email,
+            user.age,
+            user.about,
+            user.password,
+        )
         res = conn.execute(
-            "INSERT OR IGNORE INTO User(id, name, email, age, about, password) VALUES (?, ?, ?, ?, ?, ?)",
-            user_data)
+            "INSERT OR IGNORE INTO User(id, name, email, "
+            "age, about, password) VALUES (?, ?, ?, ?, ?, ?)",
+            user_data,
+        )
         if res.rowcount == 0:
             return 1
         conn.commit()
@@ -77,14 +85,24 @@ class Service(ServiceInterface):
         return 2
 
     def edit_user(self, id, user: User) -> int:
-        new_date = (user.name, user.email, user.age, user.about, user.password, user.id, user.id)
-        exist_user = next((usr for usr in users_list if usr.id == id), None)
+        new_date = (
+            user.name,
+            user.email,
+            user.age,
+            user.about,
+            user.password,
+            user.id,
+            user.id,
+        )
         db_path = os.path.join(os.getcwd(), DATABASE_URL)
         conn = sqlite3.connect(db_path)
-        user_data = (user.id, user.name, user.email, user.age, user.about, user.password)
         c = conn.cursor()
-        c.execute("UPDATE User SET name = ?, email = ?, age = ?, about = ?, password = ?"
-                  " WHERE id = ? AND EXISTS(SELECT 1 FROM User WHERE id = ?)", new_date).fetchone()
+        c.execute(
+            "UPDATE User SET name = ?, email = ?, age = ?,"
+            " about = ?, password = ? WHERE id = ? AND EXISTS(SELECT 1 "
+            "FROM User WHERE id = ?)",
+            new_date,
+        ).fetchone()
         conn.commit()
         res = c.rowcount
         conn.close()
