@@ -26,7 +26,7 @@ jobs:
       - name: Lint with flake8
         run: |
           flake8 --exclude venv  .
-      - name: Lint with flake8
+      - name: Lint with black
         run: |
           black --line-length 79 --skip-string-normalization --check .
       - name: Test with pytest
