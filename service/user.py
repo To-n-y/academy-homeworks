@@ -1,7 +1,11 @@
 import abc
+import os
+import sqlite3
+from sqlite3 import Cursor
 
-from models.user import User
+from config import DATABASE_URL
 from data.data import users_list, relations_dict
+from models.Users import User
 
 
 class ServiceInterface(metaclass=abc.ABCMeta):
@@ -28,40 +32,66 @@ class ServiceInterface(metaclass=abc.ABCMeta):
 class Service(ServiceInterface):
     # def __init__(self):
 
-    def get_users(self) -> list:
-        return users_list
+    def get_users(self):
+        db_path = os.path.join(os.getcwd(), DATABASE_URL)
+        conn = sqlite3.connect(db_path)
+        query = "SELECT * FROM User"
+        res = conn.execute(query).fetchall()
+        conn.close()
+        return res
 
-    def get_user(self, id: int) -> User:
-        user = next((user for user in users_list if user.id == id), None)
-        if user is None:
-            raise Exception
-        return user
+    def get_user(self, id: int) -> int | User:
+        db_path = os.path.join(os.getcwd(), DATABASE_URL)
+        conn = sqlite3.connect(db_path)
+        query = "SELECT * FROM User WHERE id = " + str(id) + ";"
+        res = conn.execute(query).fetchone()
+        if res is None:
+            return 1
+        conn.close()
+        return res
 
     @classmethod
     def get_user_by_email(cls, email: str | None):
         if email is None:
-            raise Exception
-        user = next((user for user in users_list if user.email == email), None)
-        if user is None:
-            raise Exception
-        return user
+            return 1
+        db_path = os.path.join(os.getcwd(), DATABASE_URL)
+        conn = sqlite3.connect(db_path)
+        query = "SELECT * FROM User WHERE email = " + email + ";"
+        res = conn.execute(query).fetchone()
+        if res is None:
+            return 1
+        conn.close()
+        return res
 
     def create_user(self, user: User) -> int:
-        if user in users_list:
+        db_path = os.path.join(os.getcwd(), DATABASE_URL)
+        conn = sqlite3.connect(db_path)
+        user_data = (user.id, user.name, user.email, user.age, user.about, user.password)
+        res = conn.execute(
+            "INSERT OR IGNORE INTO User(id, name, email, age, about, password) VALUES (?, ?, ?, ?, ?, ?)",
+            user_data)
+        if res.rowcount == 0:
             return 1
-        users_list.append(user)
+        conn.commit()
+        conn.close()
         return 2
 
     def edit_user(self, id, user: User) -> int:
+        new_date = (user.name, user.email, user.age, user.about, user.password, user.id, user.id)
         exist_user = next((usr for usr in users_list if usr.id == id), None)
-        if exist_user is None:
+        db_path = os.path.join(os.getcwd(), DATABASE_URL)
+        conn = sqlite3.connect(db_path)
+        user_data = (user.id, user.name, user.email, user.age, user.about, user.password)
+        c = conn.cursor()
+        c.execute("UPDATE User SET name = ?, email = ?, age = ?, about = ?, password = ?"
+                  " WHERE id = ? AND EXISTS(SELECT 1 FROM User WHERE id = ?)", new_date).fetchone()
+        conn.commit()
+        res = c.rowcount
+        conn.close()
+        if res > 0:
+            return 2
+        else:
             return 1
-        exist_user.name = user.name
-        exist_user.email = user.email
-        exist_user.age = user.age
-        exist_user.about = user.about
-        exist_user.password = user.password
-        return 2
 
     def add_relation(self, first_id: int, second_id: int):
         first_user = next(

@@ -25,16 +25,21 @@ class UserHandler(object):
         return current_user
 
     def get_users(self):
+        res = self.service.get_users()
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Users not found"
+            )
         return self.service.get_users()
 
     def get_user(self, id: int):
-        try:
-            exist_user = self.service.get_user(id)
-            return exist_user
-        except Exception:
+        exist_user = self.service.get_user(id)
+        print(exist_user)
+        if exist_user == 1:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
+        return exist_user
 
     def create_user(
         self,
@@ -63,14 +68,12 @@ class UserHandler(object):
             return user
 
     def login_user(self, form_data: OAuth2PasswordRequestForm = Depends()):
-        try:
-            user = self.service.get_user_by_email(form_data.username)
-        except Exception:
+        user = self.service.get_user_by_email(form_data.username)
+        if user == 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Incorrect name or email",
             )
-
         hashed_pass = user.password
         if not verify_password(form_data.password, hashed_pass):
             raise HTTPException(
