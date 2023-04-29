@@ -6,10 +6,10 @@ class UserAuth(BaseModel):
     password: str | None
 
 
-class UserOut(BaseModel):
+class User(BaseModel):
+    name: str
+    age: int
     id: int
-    email: str
 
-
-class SystemUser(UserOut):
-    password: str
+    class Config:
+        orm_mode = True
