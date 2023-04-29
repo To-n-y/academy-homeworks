@@ -31,10 +31,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuth:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    try:
-        user = Service.get_user_by_email(token_data.sub)
-        # print(token_data.sub, token_data.exp)
-    except Exception:
+    user = Service.get_user_by_email(token_data.sub)
+    # print(token_data.sub, token_data.exp)
+    if user == 1:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find user",
