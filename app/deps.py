@@ -5,9 +5,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 
-from schemas.TokenSchemas import TokenPayload
-from schemas.UserSchemas import UserAuth
-from service.UserInterface import UserService
+from app.schemas.TokenSchemas import TokenPayload
+from app.schemas.UserSchemas import UserAuth
+from app.service.UserService import UserService
 from app.utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")

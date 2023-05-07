@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 
-from deps import get_current_user
-from schemas.UserSchemas import UserAuth
-from service.FriendInterface import FriendService
-from service.UserInterface import UserService
+from app.deps import get_current_user
+from app.schemas.UserSchemas import UserAuth
+from app.service.FriendService import FriendService
+from app.service.UserService import UserService
 
 
 class FriendsHandler(object):

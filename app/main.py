@@ -1,8 +1,8 @@
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from routers.routerfriends import routerFriends
-from routers.routeruser import routerUser
+from app.routers.routerfriends import routerFriends
+from app.routers.routeruser import routerUser
 
 from scripts.create_db import main as create_database
 

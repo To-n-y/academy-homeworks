@@ -1,13 +1,13 @@
 import os
 import sqlite3
 
-from config import DATABASE_URL
+from app.config import DATABASE_URL
 
 
-def create_database():
-    # parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir, 'db'))
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+def main():
+    parent_dir = os.path.join(os.getcwd(), 'db')
     db_path = os.path.join(parent_dir, DATABASE_URL)
+    print(db_path)
 
     conn = sqlite3.connect(db_path)
 
@@ -37,4 +37,4 @@ def create_database():
 
 
 if __name__ == "__main__":
-    create_database()
+    main()

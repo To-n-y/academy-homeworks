@@ -3,7 +3,7 @@ import sqlite3
 from abc import ABC
 
 from app.config import DATABASE_URL
-from app.models import User
+from app.models.user import User
 from app.service.ServiceInterface import ServiceInterface
 
 

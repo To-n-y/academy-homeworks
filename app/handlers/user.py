@@ -2,15 +2,15 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
-from models.user import User
-from schemas.UserSchemas import UserAuth
-from service.UserInterface import UserService
+from app.models.user import User
+from app.schemas.UserSchemas import UserAuth
+from app.service.UserService import UserService
 from app.utils.jwtutils import (
     get_hashed_password,
     verify_password,
     create_access_token,
 )
-from deps import get_current_user
+from app.deps import get_current_user
 
 
 class UserHandler(object):
