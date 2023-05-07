@@ -6,6 +6,11 @@ from routers.routeruser import routerUser
 
 app = FastAPI()
 
+app.include_router(routerFriends, prefix="/friends")
+app.include_router(routerUser, prefix="/user")
+
+chat_rooms = {}
+
 
 @app.websocket("/ws")
 async def websocket(websocket: WebSocket):
@@ -13,12 +18,6 @@ async def websocket(websocket: WebSocket):
     data = await websocket.receive_text()
     await websocket.send_text(f"You sent: {data}")
     await websocket.close()
-
-
-app.include_router(routerFriends, prefix="/friends")
-app.include_router(routerUser, prefix="/user")
-
-chat_rooms = {}
 
 
 @app.websocket("/ws/{chat_name}")

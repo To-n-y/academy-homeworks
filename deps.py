@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from schemas.TokenSchemas import TokenPayload
 from schemas.UserSchemas import UserAuth
-from service.user import Service
+from service.UserInterface import UserService
 from utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
@@ -31,7 +31,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuth:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = Service.get_user_by_email(token_data.sub)
+    user = UserService.get_user_by_email(token_data.sub)
     # print(token_data.sub, token_data.exp)
     if user == 1:
         raise HTTPException(

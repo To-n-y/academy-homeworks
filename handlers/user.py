@@ -4,7 +4,7 @@ from starlette import status
 
 from models.user import User
 from schemas.UserSchemas import UserAuth
-from service.user import Service
+from service.UserInterface import UserService
 from utils.jwtutils import (
     get_hashed_password,
     verify_password,
@@ -14,7 +14,7 @@ from deps import get_current_user
 
 
 class UserHandler(object):
-    def __init__(self, service: Service, router: APIRouter):
+    def __init__(self, service: UserService, router: APIRouter):
         self._router = router
         self.service = service
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
 from handlers.user import UserHandler
-from service.user import Service
+from service.UserInterface import UserService
 
-service = Service()
+service = UserService()
 routerUser = APIRouter()
 routerUser.handler = UserHandler(service, routerUser)
 routerUser.handler.add_route()

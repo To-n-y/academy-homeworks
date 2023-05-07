@@ -27,9 +27,6 @@ class User:
             f"email={self.email}, age={self.age}, about={self.about})"
         )
 
-    def __eq__(self, other):
-        return self.id == other.id
-
     def json(self):
         return {
             "id": self.id,
