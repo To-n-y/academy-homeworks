@@ -9,7 +9,7 @@ from app.service.ServiceInterface import ServiceInterface
 class FriendService(ServiceInterface, ABC):
     # def __init__(self):
 
-    def add_relation(self, first_id: int, second_id: int):
+    def add_relation(self, first_id: int, second_id: int) -> int:
         db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
         conn = sqlite3.connect(db_path)
         if first_id == second_id:
@@ -48,17 +48,20 @@ class FriendService(ServiceInterface, ABC):
         conn.close()
         return 4
 
-    def is_friends(self, first_id: int, second_id: int):
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
+    def is_friends(self, first_id: int, second_id: int) -> int:
         if first_id == second_id:
             return 2
+
+        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
+        conn = sqlite3.connect(db_path)
 
         query1 = "SELECT * FROM User WHERE id = " + str(first_id) + ";"
         res1 = conn.execute(query1).fetchone()
         query2 = "SELECT * FROM User WHERE id = " + str(second_id) + ";"
         res2 = conn.execute(query2).fetchone()
+
         if res1 is None or res2 is None:
+            conn.close()
             return 1
 
         query3 = (

@@ -29,7 +29,7 @@ class UserService(ServiceInterface, ABC):
         return res
 
     @classmethod
-    def get_user_by_email(cls, email: str | None) -> User:
+    def get_user_by_email(cls, email: str | None) -> int | User:
         if email is None:
             return 1
         db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
@@ -40,8 +40,6 @@ class UserService(ServiceInterface, ABC):
         if res is None:
             return 1
         conn.close()
-        ###
-        print(res)
         usr = User(*res)
         print("USER ", usr.password)
         return usr
