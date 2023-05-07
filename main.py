@@ -4,10 +4,14 @@ from starlette.websockets import WebSocketDisconnect
 from routers.routerfriends import routerFriends
 from routers.routeruser import routerUser
 
+from scripts.create_db import create_database
+
 app = FastAPI()
 
 app.include_router(routerFriends, prefix="/friends")
 app.include_router(routerUser, prefix="/user")
+
+create_database()
 
 chat_rooms = {}
 
