@@ -1,6 +1,6 @@
 import abc
 
-from models.user import User
+from app.models import User
 
 
 class ServiceInterface:

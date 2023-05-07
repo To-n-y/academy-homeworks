@@ -2,9 +2,9 @@ import os
 import sqlite3
 from abc import ABC
 
-from config import DATABASE_URL
-from models.user import User
-from service.ServiceInterface import ServiceInterface
+from app.config import DATABASE_URL
+from app.models import User
+from app.service.ServiceInterface import ServiceInterface
 
 
 class UserService(ServiceInterface, ABC):

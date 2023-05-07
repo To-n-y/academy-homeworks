@@ -2,8 +2,8 @@ import os
 import sqlite3
 from abc import ABC
 
-from config import DATABASE_URL
-from service.ServiceInterface import ServiceInterface
+from app.config import DATABASE_URL
+from app.service.ServiceInterface import ServiceInterface
 
 
 class FriendService(ServiceInterface, ABC):

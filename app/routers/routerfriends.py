@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from handlers.friends import FriendsHandler
+from app.handlers.friends import FriendsHandler
 from service.FriendInterface import FriendService
 
 service = FriendService()

@@ -5,7 +5,7 @@ from starlette import status
 from models.user import User
 from schemas.UserSchemas import UserAuth
 from service.UserInterface import UserService
-from utils.jwtutils import (
+from app.utils.jwtutils import (
     get_hashed_password,
     verify_password,
     create_access_token,

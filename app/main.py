@@ -4,16 +4,20 @@ from starlette.websockets import WebSocketDisconnect
 from routers.routerfriends import routerFriends
 from routers.routeruser import routerUser
 
-from scripts.create_db import create_database
-
-app = FastAPI()
-
-app.include_router(routerFriends, prefix="/friends")
-app.include_router(routerUser, prefix="/user")
-
-create_database()
+from scripts.create_db import main as create_database
 
 chat_rooms = {}
+
+
+def create_app():
+    create_database()
+    application = FastAPI()
+    application.include_router(routerFriends, prefix="/friends")
+    application.include_router(routerUser, prefix="/user")
+    return application
+
+
+app = create_app()
 
 
 @app.websocket("/ws")

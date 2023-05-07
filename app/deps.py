@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from schemas.TokenSchemas import TokenPayload
 from schemas.UserSchemas import UserAuth
 from service.UserInterface import UserService
-from utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
+from app.utils.jwtutils import ALGORITHM, JWT_SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
