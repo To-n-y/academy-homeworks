@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
-from app.models.user import User
+from app.models.db_models import User
 from app.schemas.UserSchemas import UserAuth
 from app.service.UserService import UserService
 from app.utils.jwtutils import (
