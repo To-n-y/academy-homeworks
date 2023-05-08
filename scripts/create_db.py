@@ -1,39 +1,39 @@
-import os
-import sqlite3
+import psycopg2
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base
 
-from app.config import DATABASE_URL
+from app.config import DATABASE_NAME
+from app.config import DATABASE_PASSWORD
 
 
 def main():
-    parent_dir = os.path.join(os.getcwd(), 'db')
-    db_path = os.path.join(parent_dir, DATABASE_URL)
-    print(db_path)
-
-    conn = sqlite3.connect(db_path)
-
-    conn.execute(
-        """
-    CREATE TABLE IF NOT EXISTS User (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        email TEXT,
-        age INTEGER,
-        about TEXT,
-        password TEXT
-    );
-    """
-    )
-    conn.execute(
-        """
-    CREATE TABLE IF NOT EXISTS Friend (
-        first_id INTEGER,
-        second_id INTEGER
-    );
-    """
-    )
-    conn.commit()
-
+    conn = psycopg2.connect(host="localhost", user="postgres", password=f"{DATABASE_PASSWORD}")
+    conn.set_session(autocommit=True)
+    cur = conn.cursor()
+    cur.execute(f"CREATE DATABASE {DATABASE_NAME}")
+    cur.close()
     conn.close()
+    engine = create_engine(f'postgresql://postgres:{DATABASE_PASSWORD}@localhost:5432/{DATABASE_NAME}')
+
+    Base = declarative_base()
+
+    class User(Base):
+        __tablename__ = 'Users'
+        id = Column(Integer, primary_key=True)
+        name = Column(String(50), nullable=False)
+        email = Column(String(50), nullable=False)
+        age = Column(Integer)
+        about = Column(String(50), nullable=False)
+        password = Column(String(50), nullable=False)
+
+    class Friend(Base):
+        __tablename__ = 'Friends'
+        id = Column(Integer, primary_key=True)
+        first_id = Column(Integer)
+        second_id = Column(Integer)
+
+    Base.metadata.create_all(engine)
 
 
 if __name__ == "__main__":
