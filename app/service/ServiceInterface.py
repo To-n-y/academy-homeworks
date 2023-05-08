@@ -1,9 +1,9 @@
 import abc
 
-from app.models.user import User
+from app.models.db_models import User
 
 
-class ServiceInterface:
+class UserServiceInterface:
     @abc.abstractmethod
     def get_users(self):
         pass
@@ -17,8 +17,4 @@ class ServiceInterface:
 
     @abc.abstractmethod
     def edit_user(self, id, user: User):
-        pass
-
-    @abc.abstractmethod
-    def add_relation(self, first_id: int, second_id: int):
         pass

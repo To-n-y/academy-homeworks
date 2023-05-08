@@ -1,96 +1,88 @@
-import os
-import sqlite3
 from abc import ABC
 
-from app.config import DATABASE_URL
-from app.models.user import User
-from app.service.ServiceInterface import ServiceInterface
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.config import DATABASE_NAME
+from app.config import DATABASE_PASSWORD
+from app.models.db_models import User
+from app.service.ServiceInterface import UserServiceInterface
 
 
-class UserService(ServiceInterface, ABC):
+class UserService(UserServiceInterface, ABC):
     # def __init__(self):
 
     def get_users(self):
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
-        query = "SELECT * FROM User"
-        res = conn.execute(query).fetchall()
-        conn.close()
-        return res
+        engine = create_engine(
+            f'postgresql://postgres:{DATABASE_PASSWORD}'
+            f'@localhost:5432/{DATABASE_NAME}'
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        users = session.query(User).all()
+        session.close()
+        return users
 
-    def get_user(self, id: int) -> int | User:
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
-        query = "SELECT * FROM User WHERE id = " + str(id) + ";"
-        res = conn.execute(query).fetchone()
-        if res is None:
+    @classmethod
+    def get_user(cls, id: int) -> int | User:
+        engine = create_engine(
+            f'postgresql://postgres:{DATABASE_PASSWORD}'
+            f'@localhost:5432/{DATABASE_NAME}'
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        user = session.query(User).filter(User.id == id).first()
+        session.close()
+        if user is None:
             return 1
-        conn.close()
-        return res
+        return user
 
     @classmethod
     def get_user_by_email(cls, email: str | None) -> int | User:
         if email is None:
             return 1
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
-        query = "SELECT * FROM User WHERE email = " + "'" + email + "';"
-        res = conn.execute(query).fetchone()
-        print("XYU", res)
-        if res is None:
+        engine = create_engine(
+            f'postgresql://postgres:{DATABASE_PASSWORD}'
+            f'@localhost:5432/{DATABASE_NAME}'
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        user = session.query(User).filter(User.email == email).first()
+        session.close()
+        if user is None:
             return 1
-        conn.close()
-        usr = User(*res)
-        print("USER ", usr.password)
-        return usr
+        return user
 
     def create_user(self, user: User) -> int:
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
-        user_data = (
-            user.id,
-            user.name,
-            user.email,
-            user.age,
-            user.about,
-            user.password,
-        )
-        res = conn.execute(
-            "INSERT OR IGNORE INTO User(id, name, email, "
-            "age, about, password) VALUES (?, ?, ?, ?, ?, ?)",
-            user_data,
-        )
-        cnt = res.rowcount
-        conn.commit()
-        conn.close()
-        if cnt == 0:
+        exist_user = self.get_user(user.id)
+        if exist_user != 1:
             return 1
-        else:
-            return 2
+        engine = create_engine(
+            f'postgresql://postgres:{DATABASE_PASSWORD}'
+            f'@localhost:5432/{DATABASE_NAME}'
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        session.close()
+        return 2
 
     def edit_user(self, id, user: User) -> int:
-        new_date = (
-            user.name,
-            user.email,
-            user.age,
-            user.about,
-            user.password,
-            user.id,
-            user.id,
-        )
-        db_path = os.path.join(os.getcwd(), 'db', DATABASE_URL)
-        conn = sqlite3.connect(db_path)
-        c = conn.cursor()
-        c.execute(
-            "UPDATE User SET name = ?, email = ?, age = ?,"
-            " about = ?, password = ? WHERE id = ? AND EXISTS(SELECT 1 "
-            "FROM User WHERE id = ?)",
-            new_date,
-        ).fetchone()
-        conn.commit()
-        res = c.rowcount
-        conn.close()
-        if res > 0:
-            return 2
-        else:
+        exist_user = self.get_user(user.id)
+        if exist_user == 1:
             return 1
+        engine = create_engine(
+            f'postgresql://postgres:{DATABASE_PASSWORD}'
+            f'@localhost:5432/{DATABASE_NAME}'
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        user_from_db = session.query(User).get(id)
+        for key, value in user.__dict__.items():
+            if not key.startswith('_'):
+                setattr(user_from_db, key, value)
+        session.commit()
+        session.close()
+        return 2
