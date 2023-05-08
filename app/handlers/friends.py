@@ -14,9 +14,9 @@ class FriendsHandler(object):
         self.service = service
 
     def create_friend(
-            self,
-            second_id: int,
-            current_user: UserAuth = Depends(get_current_user),
+        self,
+        second_id: int,
+        current_user: UserAuth = Depends(get_current_user),
     ):
         user = UserService.get_user_by_email(current_user.email)
         friends = Friend(first_id=user.id, second_id=second_id)
